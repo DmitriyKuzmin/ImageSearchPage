@@ -1,4 +1,4 @@
-package com.demo;
+package com.kdp;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,10 +14,14 @@ import java.util.stream.Collectors;
 
 
 public class Main {
+
+    private static final String IMG_TAG_PATTERN = "(?<=<img\\s?\\S?\\s?src\\s?=\\s?\").*?(?=\")";
+    private static final String IMG_PATTERN = "^(../+)?/?.+";
+
     public static void main(String[] args) throws URISyntaxException, IOException {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Введите полный адресс сайта");
+        System.out.println("Input URL address: ");
         String url = scanner.next();
 
         URI base = new URI(url);
@@ -29,21 +33,21 @@ public class Main {
             result = br.lines().collect(Collectors.joining("\n"));
         }
 
-        Pattern pattern = Pattern.compile("(?<=<img\\s?\\S?\\s?src\\s?=\\s?\").*?(?=\")");
+        Pattern pattern = Pattern.compile(IMG_TAG_PATTERN);
         Matcher matcher = pattern.matcher(result);
         while (matcher.find()) {
-            if (matcher.group().matches("^(../+)?/?.+")) {
+            if (matcher.group().matches(IMG_PATTERN)) {
                 URI res = base.resolve(matcher.group());
                 hashSet.add(String.valueOf(res));
                 continue;
             }
             hashSet.add(matcher.group());
         }
-        if (!hashSet.isEmpty()){
+
+        if (!hashSet.isEmpty())
             hashSet.forEach(System.out::println);
-        }else {
-            System.out.println("Изображений не найдено");
-        }
+        else
+            System.out.println("Not images");
 
     }
 }
